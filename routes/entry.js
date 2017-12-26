@@ -27,7 +27,6 @@ router.param('id', function(req, res, next, id) {
         if (count > 0) {
             User.findOne( {token: id} ).then(function(user) {
                 // just log the user for now: probably don't need any more authentication
-                console.log("user validated!", user);
                 res.locals.id = id;
                 res.locals.user = user;
                 next();
@@ -73,6 +72,10 @@ router.get('/:id', function(req, res) {
                     // process random lyric
                     let line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
                     let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+                    if (lyrics.length > 25) {
+                        lyrics = lyrics.split(" ");
+                        lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
+                    }
                     let state = lyrics.replace(/[a-z]/ig, "_");
 
                     // store values in db
@@ -108,8 +111,15 @@ router.post('/:id', function(req, res) {
     console.log("next guess");
     // check for valid post content
     let guess = req.body.guess.toLowerCase();
-
-    if (guess !== undefined && guess.length == 1 && guess.match(/[a-z]/gi)) {
+    let remaining_guesses = res.locals.user.remaining_guesses;
+    if (remaining_guesses <= 0) {
+        res.send({
+            state: res.locals.user.state,
+            status: "DEAD",
+            remaining_guesses: remaining_guesses,
+        });
+    }
+    else if (guess !== undefined && guess.length == 1 && guess.match(/[a-z]/gi)) {
         guess = guess.charAt(0);
         console.log("guessed", guess);
         // grab actual string, state, and remaining_guesses from database
@@ -132,7 +142,7 @@ router.post('/:id', function(req, res) {
         // update status
         var status = not_guessed > 0 ? res.locals.user.status : "FREE";  // check database for stored value of status
         // update remaining guesses
-        let remaining_guesses = res.locals.user.remaining_guesses - lost_guess; // either guessed correct and didn't lost guess or lost guess
+        remaining_guesses -= lost_guess; // either guessed correct and didn't lost guess or lost guess
         if (remaining_guesses == 0 && status !== "FREE") {
             status = "DEAD";
         }
