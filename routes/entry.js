@@ -1,15 +1,42 @@
+/* TODO: cache data in hashmap (prob should limit to around 100 MB)
+    token: {
+        games,
+        won
+    }
+    (4B + 3B + 3B = 10B each person, max 1000B in memory at a time)
+*/
+
 const express = require('express');
 const router = express.Router();
 const path = require('path');
 const request = require('request');
 const cheerio = require('cheerio');
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+
+var User = require('../models/user');
 
 const genius_base = "http://api.genius.com";
 
 router.param('id', function(req, res, next, id) {
     console.log("user validation route: " + id);
-    next();
+    
     // try to find user in mongo db database
+    User.count( {token:id}, function(err, count) {
+        if (err) throw err;
+        if (count > 0) {
+            User.findOne( {token: id} ).then(function(user) {
+                // just log the user for now: probably don't need any more authentication
+                console.log(user);
+                next();
+            });
+        }
+        else {
+            res.send("Error: access token does not exist. Create a new one and try again");
+        }
+        
+    });
+    
     /*
     if (id != "1234" && id != "1235") {
         console.log("INVALID");
