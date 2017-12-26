@@ -1,0 +1,32 @@
+{
+  "name": "upe_spring18_challenge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UPE Spring 2018 Coding Challenge",
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/austinguo550/UPE_Spring18_CodingChallenge.git"
+  },
+  "keywords": [
+    "upe",
+    "coding",
+    "challenge"
+  ],
+  "author": "Austin Guo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/austinguo550/UPE_Spring18_CodingChallenge/issues"
+  },
+  "homepage": "https://github.com/austinguo550/UPE_Spring18_CodingChallenge#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "path": "^0.12.7",
+    "request": "^2.83.0"
+  }
+}
