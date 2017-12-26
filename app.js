@@ -3,14 +3,23 @@ const path = require('path');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 
-var info = require('./routes/info');
+// load environment variables
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').load();
+  }
 
-var app = express();
+const entry = require('./routes/entry');
+
+const app = express();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/vehicles', info);	// vehicle info
+app.use('/', entry);    // give entry point for backend
+
+app.use("*", function(req, res) {
+    res.status(404).send('404');
+});
 
 module.exports = app;
