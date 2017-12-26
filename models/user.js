@@ -2,9 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    email       : String,
-    token       : String,
-    data        : {
+    email   : String,
+    token   : String,
+    lyrics  : String,
+    state   : String,
+    status  : String,
+    remaining_guesses   : Number,
+    data    : {
         games   : Number,
         won     : Number,
     },

@@ -27,7 +27,9 @@ router.param('id', function(req, res, next, id) {
         if (count > 0) {
             User.findOne( {token: id} ).then(function(user) {
                 // just log the user for now: probably don't need any more authentication
-                console.log(user);
+                console.log("user validated!", user);
+                res.locals.id = id;
+                res.locals.user = user;
                 next();
             });
         }
@@ -36,19 +38,6 @@ router.param('id', function(req, res, next, id) {
         }
         
     });
-    
-    /*
-    if (id != "1234" && id != "1235") {
-        console.log("INVALID");
-        res.send("Invalid vehicle id: vehicle id must be 1234 or 1235");
-        res.send(404);
-    }
-    else {
-        // once validation is done save the new item in the req                 
-        req.id = id;
-    }
-    next();
-    */ 
 });
 
 // GET /ACCESS_TOKEN
@@ -79,15 +68,24 @@ router.get('/:id', function(req, res) {
                 // extract lyrics
                 request.get('http://genius.com' + api_path, function(error2, response2, body2) {
                     const $ = cheerio.load(body2);
-                    let lyrics_body = $('p', '.lyrics').text().trim().split("\n");
+                    let lyrics_body = $('p', '.lyrics').text().trim().replace(/\[[^\]]*\]/gm, "").replace(/^\s*[\r\n]/gm, "").split("\n");
 
                     // process random lyric
                     let line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
-                    let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/ig, "");
+                    let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
                     let state = lyrics.replace(/[a-z]/ig, "_");
 
+                    // store values in db
+                    User.findOneAndUpdate( {token: res.locals.id}, 
+                        {lyrics: lyrics, state: state, status: status, remaining_guesses: remaining_guesses},
+                    function(errno, user) {
+                        if (errno) throw errno;
+
+                        // otherwise update was successful
+                    });
+
                     res.send({
-                        "lyrics" : lyrics,
+                        "lyrics" : lyrics,  // will remove later
                         "state" : state,
                         "status" : status,
                         "remaining_guesses" : remaining_guesses
@@ -109,18 +107,44 @@ router.get('/:id', function(req, res) {
 router.post('/:id', function(req, res) {
     console.log("next guess");
     // check for valid post content
-    let guess = req.body.guess;
+    let guess = req.body.guess.toLowerCase();
 
-    if (guess !== undefined && guess.length == 1) {
+    if (guess !== undefined && guess.length == 1 && guess.match(/[a-z]/gi)) {
+        guess = guess.charAt(0);
+        console.log("guessed", guess);
         // grab actual string, state, and remaining_guesses from database
+        let lyrics = res.locals.user.lyrics;
+        var lost_guess = 1;
 
-        let state = "";             // process string based on what the guess was
-        let status = "";            // check database for stored value of status
-        let remaining_guesses = 3;  // check database for stored value of remaining guesses
+        // process string
+        // update state
+        var not_guessed = 0;
+        var newstate = res.locals.user.state.split("");
+        for (i = 0; i < lyrics.length; i++) {
+            if (lyrics.charAt(i) === guess) {
+                newstate[i] = guess.toString();
+                lost_guess = 0;
+            }
+            not_guessed = newstate[i] == "_" ? not_guessed + 1 : not_guessed;
+        }
+        let state = newstate.join("");
 
-        // check to see if no more _ in state: if true, status = FREE and don't update remaining guesses
+        // update status
+        var status = not_guessed > 0 ? res.locals.user.status : "FREE";  // check database for stored value of status
+        // update remaining guesses
+        let remaining_guesses = res.locals.user.remaining_guesses - lost_guess; // either guessed correct and didn't lost guess or lost guess
+        if (remaining_guesses == 0 && status !== "FREE") {
+            status = "DEAD";
+        }
 
         // update state in db, update remaining guesses in db
+        User.findOneAndUpdate( {token: res.locals.id}, 
+            {state: state, status: status, remaining_guesses: remaining_guesses},
+        function(errno, user) {
+            if (errno) throw errno;
+
+            // otherwise update was successful
+        });
 
         // send response
         res.send({
