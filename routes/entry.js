@@ -110,17 +110,23 @@ router.get('/:id', function(req, res) {
 router.post('/:id', function(req, res) {
     console.log("next guess");
     // check for valid post content
-    let guess = req.body.guess.toLowerCase();
+    let guess = req.body.guess;
     let remaining_guesses = res.locals.user.remaining_guesses;
-    if (remaining_guesses <= 0) {
+    let status = res.locals.user.status;
+    // if lost or won
+    if (remaining_guesses <= 0 || status === "FREE" || status === "DEAD") {
+        console.log("no update");
+        let win_rate = res.locals.user.data.games > 0 ? res.locals.user.data.won / res.locals.user.data.games : 0;
+
         res.send({
             state: res.locals.user.state,
-            status: "DEAD",
+            status: status,
             remaining_guesses: remaining_guesses,
+            win_rate: win_rate,
         });
     }
     else if (guess !== undefined && guess.length == 1 && guess.match(/[a-z]/gi)) {
-        guess = guess.charAt(0);
+        guess = guess.toLowerCase().charAt(0);
         console.log("guessed", guess);
         // grab actual string, state, and remaining_guesses from database
         let lyrics = res.locals.user.lyrics;
@@ -139,17 +145,27 @@ router.post('/:id', function(req, res) {
         }
         let state = newstate.join("");
 
-        // update status
-        var status = not_guessed > 0 ? res.locals.user.status : "FREE";  // check database for stored value of status
         // update remaining guesses
         remaining_guesses -= lost_guess; // either guessed correct and didn't lost guess or lost guess
-        if (remaining_guesses == 0 && status !== "FREE") {
+
+        // update status
+        if (remaining_guesses == 0)
             status = "DEAD";
-        }
+        status = not_guessed > 0 ? status : "FREE"; // if no _, definitely FREE
+
+        // take care of updating games counts
+        let games_won = res.locals.user.data.won;
+        let total_games = res.locals.user.data.games;
+        if (status === "FREE")
+            games_won += 1;
+        if (status === "FREE" || status === "DEAD")
+            total_games += 1;
+
+        let win_rate = total_games > 0 ? games_won / total_games : 0;
 
         // update state in db, update remaining guesses in db
         User.findOneAndUpdate( {token: res.locals.id}, 
-            {state: state, status: status, remaining_guesses: remaining_guesses},
+            {state: state, status: status, remaining_guesses: remaining_guesses, data: {won: games_won, games: total_games}},
         function(errno, user) {
             if (errno) throw errno;
 
@@ -161,11 +177,42 @@ router.post('/:id', function(req, res) {
             "state" : state,
             "status" : status,
             "remaining_guesses" : remaining_guesses,
+            "win_rate" : win_rate,
         });
     }
     else {
         res.status(401).send("Invalid POST request");
     }
+});
+
+
+// reset score
+// POST /ACCESS_TOKEN/reset {email:email_address}
+router.post('/:id/reset', function(req, res) {
+    console.log("resetting score for user with access token", res.locals.id);
+    let email = req.body.email;
+
+    if (email === undefined) {
+        res.status(401).send("Invalid POST request");
+    }
+    else {
+        if (email !== res.locals.user.email) {
+            console.log("Failed to reset score");
+            res.send({status: false});
+        }
+        else {
+            User.findOneAndUpdate( {token:res.locals.id},
+            {data: {won: 0, games: 0}},
+        function(errno, user) {
+            if (errno) throw errno;
+
+            // otherwise reset player's score
+            console.log("Successfully reset score!");
+            res.send({status: true})
+        });
+        }
+    }
+
 });
 
 module.exports = router;
