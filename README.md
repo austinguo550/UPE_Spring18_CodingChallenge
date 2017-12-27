@@ -6,7 +6,7 @@
 
 ### Routes:
 Below the routes are listed with example responses
-'''
+```
 GET /ACCESS_TOKEN
     Response will be the state of the hangman phrase generated with the start of this new game, as well as the status of the person and how many remaining guesses the game has.
 
@@ -43,4 +43,4 @@ Response:
 {
     "success" : true
 }
-'''
+```
