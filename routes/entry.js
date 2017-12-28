@@ -178,6 +178,7 @@ router.post('/:id', function(req, res) {
             "status" : status,
             "remaining_guesses" : remaining_guesses,
             "win_rate" : win_rate,
+            "games" : total_games,
         });
     }
     else {
