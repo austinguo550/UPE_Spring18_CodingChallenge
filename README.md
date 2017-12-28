@@ -17,11 +17,11 @@ Feel free to ask your Byte for help or guidance on the task, but do not work wit
 
 
 ### Technical Details
-The Hangman web service is at http://localhost:8080/<access-token>. Calling this endpoint will start a game and return a JSON object. But first you'll need to register an access-token to your email address. To do so, scroll down to the bottom of this page and enter the email address through which you are receiving the link to this site.
+The Hangman web service is at http://localhost:8080/[access-token]. Calling this endpoint will start a game and return a JSON object. But first you'll need to register an access-token to your email address. To do so, scroll down to the bottom of this page and enter the email address through which you are receiving the link to this site.
 
 The JSON object returned by calling the endpoint will contain **state**, **status**, and **remaining_guesses** fields. **state** shows the phrase you need to guess, and will be filled in with underscores for letters not yet guessed, and actual letters where you've already guessed matches. **status** will show the status of Neo in the current game (ALIVE, DEAD, FREE). **remaining_guessess** will show how many wrong guesses you have left before you lose the game.
 
-Follow up calls in the same game should be made to http://localhost:8080/<access-token> as well, but will POST a guess, while returning the same **state**, **status**, and **remaining_guesses**, but also having fields showing the current **win_rate** you have and the number of **games** you've played, which is the official win rate and number of games we will be using to assess whether or not you have passed the challenge or not.
+Follow up calls in the same game should be made to http://localhost:8080/[access-token] as well, but will POST a guess, while returning the same **state**, **status**, and **remaining_guesses**, but also having fields showing the current **win_rate** you have and the number of **games** you've played, which is the official win rate and number of games we will be using to assess whether or not you have passed the challenge or not.
 
 More details on the API are below.
 
