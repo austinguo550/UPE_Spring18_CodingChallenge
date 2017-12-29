@@ -14,17 +14,29 @@ Your program should run in a loop from the command line, automatically starting 
 
 We expect this problem to take 6 hours or less to solve, but you will have the entire quarter until Friday of Week 9 to complete the task.
 
-Feel free to ask your Byte for help or guidance on the task, but do not work with other inducting bits, as **the Byte-bit group with the highest win rate will each receive awards, such as Amazon Echos.**
+
+Feel free to ask your Byte for help or guidance on the task -- they are here to help you grow as a developer and follow an agile development process -- but do not work with other inducting bits, as **the Byte-bit group with the highest win rate will each receive awards, such as Amazon Echos.**
 
 
 ### Technical Details
 The Hangman web service is at http://localhost:8080/[access-token]. Calling this endpoint will start a game and return a JSON object. But first you'll need to register an access-token to your email address. To do so, scroll down to the bottom of this page and enter the email address through which you are receiving the link to this site.
 
-The JSON object returned by calling the endpoint will contain **state**, **status**, and **remaining_guesses** fields. **state** shows the phrase you need to guess, and will be filled in with underscores for letters not yet guessed, and actual letters where you've already guessed matches. **status** will show the status of Neo in the current game (ALIVE, DEAD, FREE). **remaining_guessess** will show how many wrong guesses you have left before you lose the game.
+The JSON object returned by calling the endpoint will contain **state**, **status**, and **remaining_guesses** fields. **state** shows the phrase you need to guess, and will be filled in with underscores for letters not yet guessed, and actual letters where you've already guessed matches. **status** will show the status of Neo in the current game (ALIVE, DEAD, FREE). **remaining_guesses** will show how many wrong guesses you have left before you lose the game.
 
 Follow up calls in the same game should be made to http://localhost:8080/[access-token] as well, but will POST a guess, while returning the same **state**, **status**, and **remaining_guesses**, but also having fields showing the current **win_rate** you have and the number of **games** you've played, which is the official win rate and number of games we will be using to assess whether or not you have passed the challenge or not.
 
+You may reset your number of games and your win rate by calling http://localhost:8080/[access-token]/reset as described in the API below.
+
 More details on the API are below.
+
+
+### Notes
+- Only the letters A through Z should be guessed - punctuation and spaces are already filled in.
+- You should try to figure out an algorithm that will get you as high a win rate as you can, but please try to make your code as maintainable and readable as possible.
+- Please don't hit Neo's brain endpoint too hard, for fear of giving him an aneurysm. Try not to make more than a single request per second.
+- The service only supports playing one game at a time, so don't GET http://localhost:8080/[access-token] until you're sure you're ready to move on.
+- Games and wins won't be counted until Neo is either DEAD or FREE in a given instance of a game.
+- The service will only allow you to connect with the email address at which you received the challenge into.
 
 
 ### API:
@@ -68,3 +80,9 @@ Response:
     "success" : true
 }
 ```
+
+
+### Submitting Your Solution
+When you are done, email a link to your GitHub repository containing your solution code to **austinguo550@ucla.edu** (change this to the Induction chair). Your submission time will be based on this email, though you may continue fixing up your code and making it more maintainable. Your win rate and number of games played will be read from the server for grading at some arbitrary time after **Friday of 9th week at 11:55:00 pm PST**, so reset your score or play more games at your own risk.
+
+Please also include sufficient documentation on how to build and run your submission in a README file in your repository.
