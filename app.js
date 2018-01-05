@@ -24,6 +24,7 @@ mongoose.connection
 
 const entry = require('./routes/entry');
 const mongo = require('./routes/mongo');
+const admin = require('./routes/admin');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', entry);    // give entry point for backend
 app.use('/mongo', mongo);    // misc functions mongo
+app.use('/admin', admin); // administration route
 
 app.use("*", function(req, res) {
     res.status(404).send('404');
