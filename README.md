@@ -1,5 +1,7 @@
 # README
 
+## DON'T SHARE/SHOW THIS WITH ANYBODY!!
+
 ## UPE Spring 2018 Coding Challenge
 Embed a markup Gist in the final website: http://robertgreiner.com/2012/04/using-github-as-a-syntax-highlighter/
 
