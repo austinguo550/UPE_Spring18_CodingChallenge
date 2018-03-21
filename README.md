@@ -1,9 +1,6 @@
 # README
 
-## DON'T SHARE/SHOW THIS WITH ANYBODY!!
-
 ## UPE Spring 2018 Coding Challenge
-Embed a markup Gist in the final website: http://robertgreiner.com/2012/04/using-github-as-a-syntax-highlighter/
 
 ### Objective:
 The year is 2069 and you've just discovered that you're trapped in the 420th iteration of the Matrix. You are working together with a friend named Neo to escape, but unfortunately the agents from HKN and TBP replaced Neo's blue pill with a NyQuil and he has been suspended in an infinite state of sleep, in which his only dreams are Professor David Smallberg's lectures. This would not normally be a bad thing, but you only have a quarter to escape the Matrix and induct in UPE in the real world.
