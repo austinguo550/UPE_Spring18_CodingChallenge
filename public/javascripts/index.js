@@ -31,6 +31,8 @@ async function update_token(email) {
 }
 
 window.onload = function() {
+    
+
     document.getElementById('create_token').addEventListener('click',
         function() {
             let email = document.getElementById('email_address').value;

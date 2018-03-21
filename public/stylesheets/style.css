@@ -1,0 +1,54 @@
+body {
+    margin: auto;
+    font-family: 'IBM Plex Sans Condensed', sans-serif;
+}
+
+#logo {
+    background-color: #2e6acc;
+    margin: auto;
+    display: flex;
+    font-weight: 400;
+    width: 80%;
+    color: white;
+}
+
+.navbar-brand {
+    padding-top: 10%;
+    padding-bottom: 10%;
+}
+
+#instructions {
+    margin: auto;
+    width: 80%;
+}
+
+#token-access {
+    margin: auto;
+    width: 80%;
+}
+
+input[type=text] {
+    padding: 12px 20px;
+    width: 30%;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid #2e6acc;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+    width: 60%;
+}
+
+#create_token {
+    width: 10%;
+    color: #2e6acc;
+    border-color: #2e6acc;
+}
+
+#create_token:hover {
+    width: 10%;
+    color: white;
+    background-color: #2e6acc;
+}
