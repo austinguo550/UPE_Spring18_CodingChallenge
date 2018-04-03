@@ -3,11 +3,24 @@ version: '3.3'
 services:
   mongo:
     image: mongo:3.7.3-jessie
-  node:
-    build: .
     volumes:
-      - .:/app
-    ports:
-      - "7005:80"
+      - datavolume:/data/db
+  node:
+    image: upe-coding-challenge/node:latest
+    build: node
+    volumes:
+      - ./node/:/app
     depends_on:
       - mongo
+  nginx:
+    image: upe-coding-challenge/nginx:latest
+    build: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - node
+
+volumes:
+  datavolume:

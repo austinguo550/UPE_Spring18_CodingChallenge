@@ -57,7 +57,10 @@ router.get('/:id', function(req, res) {
             json: true
         }
         // get api_path
+
+        let start = +(new Date());
         request.get(options, function(error, response, body) {
+            console.log('a', +(new Date()) - start);
             if (body.meta && body.meta.status === 200) {
                 console.log('api_path', body.response.song.api_path);
                 console.log('song_name', body.response.song.full_title);
@@ -66,6 +69,7 @@ router.get('/:id', function(req, res) {
                 // retrieved api_path: extract lyrics
                 // extract lyrics
                 request.get('http://genius.com' + api_path, function(error2, response2, body2) {
+                    console.log('b', +(new Date()) - start);
                     const $ = cheerio.load(body2);
                     let lyrics_body = $('p', '.lyrics').text().trim().replace(/\[[^\]]*\]/gm, "").replace(/^\s*[\r\n]/gm, "").split("\n");
 
@@ -79,9 +83,11 @@ router.get('/:id', function(req, res) {
                     let state = lyrics.replace(/[a-z]/ig, "_");
 
                     // store values in db
+                    console.log('c', +(new Date()) - start);
                     User.findOneAndUpdate( {token: res.locals.id}, 
                         {lyrics: lyrics, state: state, status: status, remaining_guesses: remaining_guesses},
                     function(errno, user) {
+                    console.log('d', +(new Date()) - start);
                         if (errno) throw errno;
 
                         // otherwise update was successful
@@ -93,6 +99,7 @@ router.get('/:id', function(req, res) {
                         "status" : status,
                         "remaining_guesses" : remaining_guesses
                     });
+                    console.log('e', +(new Date()) - start);
                 })
             }
             else {
