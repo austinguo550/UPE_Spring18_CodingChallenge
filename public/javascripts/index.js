@@ -2,11 +2,8 @@ const base_url = ".";   // change to heroku later
 const mongo = base_url + "/mongo"
 
 
-// for now, validating email in memory here: but need to move it to validating against server later
-var valid_emails = ["austinguo550@gmail.com"];
-
 async function update_token(email) {
-    if (email !== undefined && email !== "" && valid_emails.indexOf(email) !== -1) {
+    if (email !== undefined && email !== "") {
         const response = await fetch(mongo + "/update_token", {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
@@ -16,9 +13,9 @@ async function update_token(email) {
         });
         
         if (response.status >= 200 && response.status < 300) {
-            const text = await response.text();
+            const text = await response.json();
             console.log(text);
-            display_token.innerHTML = text;
+            display_token.innerHTML = text.token;
         } else {
             console.log("Error creating token");
             display_token.innerHTML = "Error creating token";

@@ -8,6 +8,6 @@ services:
     volumes:
       - .:/app
     ports:
-      - "7005:80"
+      - "80:80"
     depends_on:
       - mongo
