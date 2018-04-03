@@ -58,7 +58,7 @@ router.get('/:id', function(req, res) {
         }
         // get api_path
         request.get(options, function(error, response, body) {
-            if (body.meta.status === 200) {
+            if (body.meta && body.meta.status === 200) {
                 console.log('api_path', body.response.song.api_path);
                 console.log('song_name', body.response.song.full_title);
                 api_path = body.response.song.api_path;
@@ -96,6 +96,9 @@ router.get('/:id', function(req, res) {
                 })
             }
             else {
+                console.log('trying again because of:')
+                console.log(request)
+                console.log(body)
                 findValidSongID();
             }
         });
