@@ -52,7 +52,7 @@ Response:
 }
 
 POST /ACCESS_TOKEN
-    Response will be the updated state of the hangman phrase based on the guess, as well as the new gameplay status, remaining guesses, and win rate. The guess should be a single character only.
+    Response will be the updated state of the hangman phrase based on the guess, as well as the new gameplay status, remaining guesses, and win rate. The guess should be a single character only. The lyrics field will only appear when the returning status is "DEAD" or "FREE".
 
 Post Data:
 {
@@ -64,7 +64,8 @@ Response:
     "status"    : "DEAD",
     "remaining_guesses" : 0,
     "win_rate"  : 0.25,
-    "games"     : 101
+    "games"     : 101,
+    "lyrics"    : "mad I shat like"
 }
 
 POST /ACCESS_TOKEN/reset
