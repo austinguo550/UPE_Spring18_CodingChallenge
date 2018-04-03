@@ -19,6 +19,7 @@ router.post('/update_token', function(req, res) {
 
     if (emails.indexOf(req.body.email) === -1) {
         res.send(400).status("Email does not exist");
+        return;
     }
 
     function makeid() {
@@ -28,16 +29,13 @@ router.post('/update_token', function(req, res) {
         for (var i = 0; i < 5; i++)
             token += possible.charAt(Math.floor(Math.random() * possible.length));
 
-        if (token === undefined) {
-            makeid();
-        }
-
         User.count( {token:token}, function(err, count) {
             if (err) throw err;
     
             if (count > 0) {
                 // token already exists, generate another one
                 makeid();
+                return;
             }
         });
       
@@ -57,7 +55,7 @@ router.post('/update_token', function(req, res) {
                     console.log("user exists");
                     console.log(user);
 
-                    res.status(200).send({token: token});
+                    res.send({token: token});
                 });
             }
             else {
@@ -77,7 +75,7 @@ router.post('/update_token', function(req, res) {
                     if (err3) throw err3;
 
                     console.log("User created!");
-                    res.status(200).send({token: token});
+                    res.send({token: token});
                 })
             }
             

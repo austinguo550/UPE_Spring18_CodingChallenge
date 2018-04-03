@@ -12,11 +12,12 @@ services:
       - ./node/:/app
     depends_on:
       - mongo
+
   nginx:
     image: upe-coding-challenge/nginx:latest
     build: nginx
     ports:
-      - "80:80"
+      - "42069:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:

@@ -23,10 +23,12 @@
   },
   "homepage": "https://github.com/austinguo550/UPE_Spring18_CodingChallenge#readme",
   "dependencies": {
+    "badwords": "^1.0.0",
     "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^4.0.0",
-    "express": "^4.16.2",
+    "express": "^4.16.3",
+    "franc": "^3.1.1",
     "genius-api": "^0.4.1",
     "mongoose": "^4.13.7",
     "morgan": "^1.9.0",

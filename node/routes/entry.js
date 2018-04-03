@@ -4,6 +4,9 @@ const path = require('path');
 const request = require('request');
 const cheerio = require('cheerio');
 const mongoose = require('mongoose');
+const badwordsRegexp = require('badwords/regexp');
+const franc = require('franc');
+
 mongoose.Promise = global.Promise;
 
 var User = require('../models/user');
@@ -43,7 +46,7 @@ router.get('/:id', function(req, res) {
 
     // enclosed function
     function findValidSongID() {
-        let songID = Math.ceil(Math.random() * 600000 + 100000); // num from 100,000 - 700,000
+        let songID = Math.ceil(Math.random() * 15000 + 3000);
         options = {
             url: genius_base + '/songs/' + songID,
             headers: {'Authorization' : 'Bearer ' + process.env.ACCESS_TOKEN},
@@ -62,7 +65,7 @@ router.get('/:id', function(req, res) {
                     let lyrics_body = song.lyrics;
 
                     // process random lyric
-                    let line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
+                    let line_id = Math.floor(Math.random() * (lyrics_body.length - 1));
                     let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
                     if (lyrics.length > 25) {
                         lyrics = lyrics.split(" ");
@@ -107,8 +110,26 @@ router.get('/:id', function(req, res) {
                 request.get('http://genius.com' + api_path, function(error2, response2, body2) {
                     console.log('b', +(new Date()) - start);
                     const $ = cheerio.load(body2);
-                    let lyrics_body = $('p', '.lyrics').text().trim().replace(/\[[^\]]*\]/gm, "").replace(/^\s*[\r\n]/gm, "").split("\n");
+                    let lyrics_text = $('p', '.lyrics').text().trim().replace(/\[[^\]]*\]/gm, "").replace(/^\s*[\r\n]/gm, "");
+                    let lyrics_body = lyrics_text.split('\n');
 
+                    let english_percentage = 0;
+                    for (let lan of franc.all(lyrics_text)){
+                        if (lan[0] == 'eng'){
+                            english_percentage = lan[1];
+                            break;
+                        }
+                    }
+                    if (english_percentage < .7){
+                        console.log('Rejecting because of english percentage of: ', english_percentage);
+                        return findValidSongID();
+                    }
+
+                    let bad_word_count = lyrics_text.search(badwordsRegexp);
+                    if (bad_word_count > 50){
+                        console.log('Rejecting because of bad word count of: ', bad_word_count);
+                        return findValidSongID();
+                    }
 
                     // cache the song with lyrics to disk
                     let newSong = Song({
@@ -116,6 +137,9 @@ router.get('/:id', function(req, res) {
                         name: body.response.song.full_title,
                         lyrics: lyrics_body,
                     });
+
+
+
 
                     console.log("saving new song");
                     newSong.save(function(err3) {
