@@ -1,11 +1,3 @@
-/* TODO: cache data in hashmap (prob should limit to around 100 MB)
-    token: {
-        games,
-        won
-    }
-    (4B + 3B + 3B = 10B each person, max 1000B in memory at a time)
-*/
-
 const express = require('express');
 const router = express.Router();
 const path = require('path');
@@ -15,6 +7,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 var User = require('../models/user');
+var Song = require('../models/song');
 
 const genius_base = "http://api.genius.com";
 
@@ -50,12 +43,55 @@ router.get('/:id', function(req, res) {
 
     // enclosed function
     function findValidSongID() {
-        let songID = Math.ceil(Math.random() * 700,000); // num from 1 - 50,000
+        let songID = Math.ceil(Math.random() * 600000 + 100000); // num from 100,000 - 700,000
         options = {
             url: genius_base + '/songs/' + songID,
             headers: {'Authorization' : 'Bearer ' + process.env.ACCESS_TOKEN},
             json: true
         }
+
+        Song.count( {songId:songID}, function(err, count) {
+            if (err) throw err;
+    
+            if (count > 0) {
+                console.log("Song is already cached");
+                // song is cached, use it
+                Song.findOne( {songId: songID}, function(errno, song) {
+                    if (errno) throw errno;
+
+                    let lyrics_body = song.lyrics;
+
+                    // process random lyric
+                    let line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
+                    let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+                    if (lyrics.length > 25) {
+                        lyrics = lyrics.split(" ");
+                        lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
+                    }
+                    let state = lyrics.replace(/[a-z]/ig, "_");
+
+                    // store values in db
+                    User.findOneAndUpdate( {token: res.locals.id}, 
+                        {lyrics: lyrics, state: state, status: status, remaining_guesses: remaining_guesses},
+                    function(errno, user) {
+                        if (errno) throw errno;
+
+                        // otherwise update was successful
+                    });
+
+                    res.send({
+                        // "lyrics" : lyrics,  // will remove later
+                        "state" : state,
+                        "status" : status,
+                        "remaining_guesses" : remaining_guesses,
+                    });
+
+                    return;
+                });
+            }
+        });
+
+
         // get api_path
 
         let start = +(new Date());
@@ -72,6 +108,22 @@ router.get('/:id', function(req, res) {
                     console.log('b', +(new Date()) - start);
                     const $ = cheerio.load(body2);
                     let lyrics_body = $('p', '.lyrics').text().trim().replace(/\[[^\]]*\]/gm, "").replace(/^\s*[\r\n]/gm, "").split("\n");
+
+
+                    // cache the song with lyrics to disk
+                    let newSong = Song({
+                        songId: songID,
+                        name: body.response.song.full_title,
+                        lyrics: lyrics_body,
+                    });
+
+                    console.log("saving new song");
+                    newSong.save(function(err3) {
+                        if (err3) throw err3;
+    
+                        console.log("Song saved!");
+                    })
+
 
                     // process random lyric
                     let line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
@@ -94,7 +146,7 @@ router.get('/:id', function(req, res) {
                     });
 
                     res.send({
-                        "lyrics" : lyrics,  // will remove later
+                        // "lyrics" : lyrics,  // will remove later
                         "state" : state,
                         "status" : status,
                         "remaining_guesses" : remaining_guesses
@@ -182,14 +234,20 @@ router.post('/:id', function(req, res) {
             // otherwise update was successful
         });
 
-        // send response
-        res.send({
+
+        let response = {
             "state" : state,
             "status" : status,
             "remaining_guesses" : remaining_guesses,
             "win_rate" : win_rate,
             "games" : total_games,
-        });
+        }
+
+        if (status === "FREE" || status === "DEAD")
+            response.lyrics = lyrics;
+
+        // send response
+        res.send(response);
     }
     else {
         res.status(401).send("Invalid POST request");

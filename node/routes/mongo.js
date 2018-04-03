@@ -5,12 +5,22 @@ const request = require('request');
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
+const emails = require('./emails'); // only returns one array (not json obj)
+
 var User = require('../models/user');
+var Song = require('../models/song');
 
 
 // update access token
 router.post('/update_token', function(req, res) {
     console.log("hit update token");
+
+    console.log(emails);
+
+    if (emails.indexOf(req.body.email) === -1) {
+        res.send(400).status("Email does not exist");
+    }
+
     function makeid() {
         var token = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
