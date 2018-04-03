@@ -1,4 +1,4 @@
-const base_url = "http://localhost:8080";   // change to heroku later
+const base_url = ".";   // change to heroku later
 const mongo = base_url + "/mongo"
 
 

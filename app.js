@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const User = require('./models/user');
 // connect to mongodb
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://mongo/test');
 //mongoose.connect(process.env.MONGODB_URI); // for when fully deployed to heroku
 mongoose.connection
   .once('open', function () {

@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  mongo:
+    image: mongo:3.7.3-jessie
+  node:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "7005:80"
+    depends_on:
+      - mongo
