@@ -65,12 +65,19 @@ router.get('/:id', function(req, res) {
                     let lyrics_body = song.lyrics;
 
                     // process random lyric
-                    let line_id = Math.floor(Math.random() * (lyrics_body.length - 1));
-                    let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
-                    if (lyrics.length > 25) {
-                        lyrics = lyrics.split(" ");
-                        lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
-                    }
+                    
+                    var line_id = Math.floor(Math.random() * (lyrics_body.length - 1));
+                    var lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+
+
+		    while (lyrics.length < 25) {
+
+                        line_id = Math.floor(Math.random() * (lyrics_body.length - 1));
+                    	lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+		    }
+
+                    lyrics = lyrics.split(" ");
+                    lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
                     let state = lyrics.replace(/[a-z]/ig, "_");
 
                     // store values in db
@@ -120,7 +127,7 @@ router.get('/:id', function(req, res) {
                             break;
                         }
                     }
-                    if (english_percentage < .7){
+                    if (english_percentage < .9){
                         console.log('Rejecting because of english percentage of: ', english_percentage);
                         return findValidSongID();
                     }
@@ -131,6 +138,7 @@ router.get('/:id', function(req, res) {
                         return findValidSongID();
                     }
 
+		    /*
                     // cache the song with lyrics to disk
                     let newSong = Song({
                         songId: songID,
@@ -146,16 +154,24 @@ router.get('/:id', function(req, res) {
                         if (err3) throw err3;
     
                         console.log("Song saved!");
-                    })
-
+                    });
+	            */
 
                     // process random lyric
-                    let line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
-                    let lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
-                    if (lyrics.length > 25) {
-                        lyrics = lyrics.split(" ");
-                        lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
-                    }
+                    
+		    console.log("lyrics length is ", lyrics_body.length - 1);		    
+
+		    	var line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
+                    	var lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+		    while (lyrics.length < 25) {
+			
+		    	line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
+                    	lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+		    }
+
+                    console.log("LYRICS I'M RETURNING: ", lyrics);
+                    lyrics = lyrics.split(" ");
+                    lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
                     let state = lyrics.replace(/[a-z]/ig, "_");
 
                     // store values in db
@@ -176,7 +192,7 @@ router.get('/:id', function(req, res) {
                         "remaining_guesses" : remaining_guesses
                     });
                     console.log('e', +(new Date()) - start);
-                })
+                });
             }
             else {
                 console.log('trying again because of:')
