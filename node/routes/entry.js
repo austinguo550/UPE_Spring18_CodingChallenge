@@ -70,11 +70,11 @@ router.get('/:id', function(req, res) {
                     var lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
 
 
-		    while (lyrics.length < 25) {
+		            while (lyrics.length < 25) {
 
                         line_id = Math.floor(Math.random() * (lyrics_body.length - 1));
                     	lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
-		    }
+		            }
 
                     lyrics = lyrics.split(" ");
                     lyrics = lyrics.slice(0, lyrics.length - lyrics.length/3).join(" ");
@@ -133,7 +133,7 @@ router.get('/:id', function(req, res) {
                     }
 
                     let bad_word_count = lyrics_text.search(badwordsRegexp);
-                    if (bad_word_count > 50){
+                    if (bad_word_count > 1000){
                         console.log('Rejecting because of bad word count of: ', bad_word_count);
                         return findValidSongID();
                     }
@@ -159,15 +159,15 @@ router.get('/:id', function(req, res) {
 
                     // process random lyric
                     
-		    console.log("lyrics length is ", lyrics_body.length - 1);		    
+		        console.log("lyrics length is ", lyrics_body.length - 1);		    
 
 		    	var line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
                     	var lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
-		    while (lyrics.length < 25) {
+		        while (lyrics.length < 25) {
 			
-		    	line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
-                    	lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
-		    }
+		    	    line_id = Math.floor(Math.random() * (lyrics_body.length - 1)); // num from 1 - 50,000
+                    lyrics = lyrics_body.slice(line_id, line_id + 1).toString().replace(/\\/igm, "").toLowerCase();
+		        }
 
                     console.log("LYRICS I'M RETURNING: ", lyrics);
                     lyrics = lyrics.split(" ");
