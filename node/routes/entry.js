@@ -53,9 +53,12 @@ router.get('/:id', function(req, res) {
             json: true
         }
 
+	/*
         Song.count( {songId:songID}, function(err, count) {
             if (err) throw err;
-    
+
+
+	    
             if (count > 0) {
                 console.log("Song is already cached");
                 // song is cached, use it
@@ -100,6 +103,7 @@ router.get('/:id', function(req, res) {
                 });
             }
         });
+	*/
 
 
         // get api_path
