@@ -62,7 +62,7 @@ router.post('/winners', function(req, res) {
 
             passing_users.sort(predicateBy("score"));
 
-            res.send(passing_users.slice(1,4));
+            res.send(passing_users.slice(0,3));
         });
     }
     else {
