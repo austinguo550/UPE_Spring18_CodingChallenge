@@ -81,6 +81,6 @@ Response:
 
 
 ### Submitting Your Solution
-When you are done, email a link to your GitHub repository containing your solution code to **austinguo550@ucla.edu** (change this to the Induction chair). Your submission time will be based on this email, though you may continue fixing up your code and making it more maintainable. Your win rate and number of games played will be read from the server for grading at some arbitrary time after **Friday of 9th week at 11:55:00 pm PST**, so reset your score or play more games at your own risk.
+When you are done, email a link to your GitHub repository containing your solution code to **austinguo550@ucla.edu**. Your submission time will be based on this email, though you may continue fixing up your code and making it more maintainable. Your win rate and number of games played will be read from the server for grading at some arbitrary time after **Friday of 9th week at 11:55:00 pm PST**, so reset your score or play more games at your own risk.
 
 Please also include sufficient documentation on how to build and run your submission in a README file in your repository.
